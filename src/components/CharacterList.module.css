@@ -1,0 +1,80 @@
+.container {
+  width: 100%;
+}
+
+.errorMessage {
+  margin-bottom: 16px;
+  padding: 16px;
+  background-color: rgba(254, 226, 226, 0.1);
+  border: 1px solid rgba(248, 113, 113, 0.4);
+  color: #fca5a5;
+  border-radius: 8px;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 32px 0;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.charactersGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.pagination {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+}
+
+.paginationButton {
+  padding: 8px 16px;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.9);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.paginationButton:hover:not(:disabled) {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.paginationButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.paginationInfo {
+  padding: 8px 16px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.charactersWrapper {
+  display: flex;
+}
+
+@media (min-width: 768px) {
+  .charactersGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .charactersGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1280px) {
+  .charactersGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
