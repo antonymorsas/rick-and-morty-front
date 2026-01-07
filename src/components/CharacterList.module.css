@@ -1,5 +1,6 @@
 .container {
   width: 100%;
+  padding: 48px;
 }
 
 .errorMessage {
@@ -33,22 +34,47 @@
 }
 
 .paginationButton {
-  padding: 8px 16px;
-  background-color: rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.9);
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background-color: rgba(123, 123, 123, 0.7);
   border: none;
   border-radius: 8px;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: background-color 0.2s;
 }
 
 .paginationButton:hover:not(:disabled) {
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: rgba(123, 123, 123, 0.7);
+}
+
+.paginationButton:active:not(:disabled) {
+  background-color: rgba(91, 84, 84, 0.7);
 }
 
 .paginationButton:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.arrowIcon {
+  filter: brightness(0) invert(1);
+  transition: filter 0.2s;
+}
+
+.paginationButton:hover:not(:disabled) .arrowIcon {
+  filter: brightness(0) saturate(100%) invert(67%) sepia(95%) saturate(1234%) hue-rotate(60deg) brightness(101%) contrast(101%);
+}
+
+.paginationButton:active:not(:disabled) .arrowIcon {
+  filter: brightness(0) saturate(100%) invert(67%) sepia(95%) saturate(1234%) hue-rotate(60deg) brightness(101%) contrast(101%);
+}
+
+.arrowIconRotated {
+  transform: rotate(180deg);
 }
 
 .paginationInfo {
@@ -63,18 +89,6 @@
 @media (min-width: 768px) {
   .charactersGrid {
     grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (min-width: 1024px) {
-  .charactersGrid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-@media (min-width: 1280px) {
-  .charactersGrid {
-    grid-template-columns: repeat(4, 1fr);
   }
 }
 

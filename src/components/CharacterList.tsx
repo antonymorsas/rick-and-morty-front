@@ -1,11 +1,13 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { useAction } from '@/hooks/useAction';
-import { getCharactersPage } from '@/actions/characters';
+import { getCharactersPage, searchCharacters } from '@/actions/characters';
 import type { CharactersResponse } from '@/types/api';
 import CharacterCard from './CharacterCard';
 import { SkeletonGrid } from './Skeleton';
+import SearchInput from './SearchInput';
 import styles from './CharacterList.module.css';
 
 interface CharacterListProps {
@@ -16,6 +18,7 @@ export default function CharacterList({ initialData }: CharacterListProps) {
   const [characters, setCharacters] = useState(initialData.results);
   const [info, setInfo] = useState(initialData.info);
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const { error, isLoading, execute } = useAction<CharactersResponse>({
     onSuccess: (data) => {
@@ -28,11 +31,27 @@ export default function CharacterList({ initialData }: CharacterListProps) {
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
-    execute(() => getCharactersPage(page));
+    if (searchQuery) {
+      execute(() => searchCharacters(searchQuery, page));
+    } else {
+      execute(() => getCharactersPage(page));
+    }
+  };
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    setCurrentPage(1);
+    if (query.trim()) {
+      execute(() => searchCharacters(query, 1));
+    } else {
+      execute(() => getCharactersPage(1));
+    }
   };
 
   return (
     <div className={styles.container}>
+      <SearchInput onSearch={handleSearch} />
+      
       {/* Error Message */}
       {error && (
         <div className={styles.errorMessage}>
@@ -66,7 +85,13 @@ export default function CharacterList({ initialData }: CharacterListProps) {
                     disabled={!info.prev || isLoading}
                     className={styles.paginationButton}
                   >
-                    B
+                    <Image 
+                      src="/icons/arrow.svg" 
+                      alt="previous page" 
+                      width={17} 
+                      height={11}
+                      className={styles.arrowIcon}
+                    />
                   </button>
                   
                   <button
@@ -74,7 +99,13 @@ export default function CharacterList({ initialData }: CharacterListProps) {
                     disabled={!info.next || isLoading}
                     className={styles.paginationButton}
                   >
-                    N
+                    <Image 
+                      src="/icons/arrow.svg" 
+                      alt="next page" 
+                      width={17} 
+                      height={11}
+                      className={`${styles.arrowIcon} ${styles.arrowIconRotated}`}
+                    />
                   </button>
                 </div>
               )}

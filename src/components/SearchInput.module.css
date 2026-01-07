@@ -1,0 +1,41 @@
+.form {
+  width: 50%;
+  margin: 0 auto 48px;
+}
+
+.inputContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 16px;
+  z-index: 1;
+}
+
+.input {
+  width: 100%;
+  padding: 0 16px 0 44px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--primary);
+  border-radius: 8px;
+  color: white;
+  font-size: 1rem;
+  line-height: 44px;
+  height: 44px;
+  outline: none;
+  transition: border-color 0.2s, background-color 0.2s;
+  box-sizing: border-box;
+}
+
+.input::placeholder {
+  color: rgba(118, 221, 0, 0.5);
+}
+
+.input:focus {
+  border-color: var(--primary);
+  background-color: rgba(255, 255, 255, 0.15);
+}
+

@@ -1,0 +1,31 @@
+.container {
+  background-color: #2b2b2b;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  border-radius: 12px;
+  min-width: 110px;
+}
+
+.indicator {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+}
+
+.alive {
+  background: radial-gradient(circle, #f1f510 0%, #608f09 100%);
+}
+
+.dead {
+  background: radial-gradient(circle, #e92507 0%, #7c1616 100%);
+}
+
+.unknown {
+  background: radial-gradient(circle, #9ca3af 0%, #6b7280 100%);
+}
+
+.statusText {
+  text-transform: uppercase;
+}

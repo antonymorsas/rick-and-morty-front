@@ -27,3 +27,26 @@ export async function getCharactersPage(
   }
 }
 
+export async function searchCharacters(
+  name: string,
+  page: number = 1
+): Promise<import('@/lib/core/errors/result').ActionResult<CharactersResponse>> {
+  try {
+    const url = `${API_BASE_URL}/character?name=${encodeURIComponent(name)}&page=${page}`;
+    const response = await fetch(url, {
+      next: { revalidate: 60 }, 
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to search characters: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return successResult(data);
+  } catch (error) {
+    return errorResult(
+      error instanceof Error ? error : new Error('Failed to search characters')
+    );
+  }
+}
+

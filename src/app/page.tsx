@@ -1,5 +1,4 @@
 import Image from "next/image";
-import Card from "../components/Card";
 import CharacterList from "../components/CharacterList";
 import CharacterInfo from "../components/CharacterInfo";
 import { getCharactersPage } from "../actions/characters";
@@ -34,12 +33,12 @@ export default async function Home() {
             className={styles.titleImage}
           />
         </div>
-        <Card className={styles.cardContent}>
+        <div className={styles.cardContent}>
           {initialData.results.length > 0 && (
             <CharacterInfo character={initialData.results[0]} />
           )}
           <CharacterList initialData={initialData} />
-        </Card>
+        </div>
       </div>
     </div>
   );
