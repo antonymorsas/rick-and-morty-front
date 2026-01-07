@@ -23,6 +23,20 @@
   z-index: 0;
 }
 
+.imageContainer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  box-shadow: 
+    inset 0 10px 10px -10px rgba(0, 0, 0, 0.25),
+    inset -10px 0 10px -10px rgba(0, 0, 0, 0.25);
+  pointer-events: none;
+}
+
 .image {
   width: 100%;
   height: 100%;

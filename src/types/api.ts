@@ -1,6 +1,6 @@
 import { Character } from './character';
 
-export const API_BASE_URL = process.env.RICK_AND_MORTY_API_URL || 'https://rickandmortyapi.com/api';
+// API_BASE_URL removed - rickmortyapi package handles base URL internally
 
 export interface ApiInfo {
   count: number;

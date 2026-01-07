@@ -22,6 +22,7 @@ export default async function Home() {
 
   return (
     <div className={styles.page}>
+      <div className={styles.gradientOverlay}></div>
       <div className={styles.container}>
         <div className={styles.titleContainer}>
           <Image
