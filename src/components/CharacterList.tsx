@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useCallback } from 'react';
 import Image from 'next/image';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAction } from '@/hooks/useAction';
 import { getCharactersPage, searchCharacters } from '@/actions/characters';
 import type { CharactersResponse } from '@/types/api';
@@ -13,9 +14,12 @@ import styles from './CharacterList.module.css';
 
 interface CharacterListProps {
   initialData: CharactersResponse;
+  selectedCharacterId?: number;
 }
 
-export default function CharacterList({ initialData }: CharacterListProps) {
+export default function CharacterList({ initialData, selectedCharacterId }: CharacterListProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const CHARACTERS_PER_PAGE_UI = 4;
   const [cachedCharacters, setCachedCharacters] = useState<Character[]>(initialData.results);
   const [info, setInfo] = useState(initialData.info);
@@ -23,6 +27,12 @@ export default function CharacterList({ initialData }: CharacterListProps) {
   const [internalPage, setInternalPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
   const [isNavigatingBackward, setIsNavigatingBackward] = useState(false);
+
+  const handleCharacterClick = useCallback((id: number) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('characterId', id.toString());
+    router.push(`?${params.toString()}`, { scroll: false });
+  }, [router, searchParams]);
 
   const { error, isLoading, execute } = useAction<CharactersResponse>({
     onSuccess: (data) => {
@@ -128,7 +138,12 @@ export default function CharacterList({ initialData }: CharacterListProps) {
           ) : (
             <div className={styles.charactersGrid}>
               {displayedCharacters.map((character) => (
-                <CharacterCard key={character.id} character={character} />
+                <CharacterCard 
+                  key={character.id} 
+                  character={character}
+                  isSelected={character.id === selectedCharacterId}
+                  onClick={handleCharacterClick}
+                />
               ))}
             </div>
           )}

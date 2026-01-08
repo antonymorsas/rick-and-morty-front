@@ -12,6 +12,11 @@
 .card:hover {
   background-color: rgba(79, 79, 79, 0.8);
   box-shadow: 15px 15px 30px #191919;
+}
+
+.card.selected {
+  background-color: rgba(79, 79, 79, 0.8);
+  box-shadow: 15px 15px 30px #191919;
   border-color: var(--primary);
 }
 

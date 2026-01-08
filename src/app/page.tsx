@@ -1,11 +1,19 @@
 import Image from "next/image";
 import CharacterList from "../components/CharacterList";
 import CharacterInfo from "../components/CharacterInfo";
-import { getCharactersPage } from "../actions/characters";
+import { getCharactersPage, getCharacterById } from "../actions/characters";
 import type { CharactersResponse } from "@/types/api";
+import type { Character } from "@/types/character";
 import styles from "./page.module.css";
 
-export default async function Home() {
+interface HomeProps {
+  searchParams: Promise<{ characterId?: string }>;
+}
+
+export default async function Home({ searchParams }: HomeProps) {
+  const params = await searchParams;
+  const characterId = params.characterId ? Number(params.characterId) : undefined;
+  
   const result = await getCharactersPage(1);
   
   const initialData: CharactersResponse = result.success
@@ -19,6 +27,23 @@ export default async function Home() {
         },
         results: [],
       };
+
+  // Get selected character
+  let selectedCharacter: Character | null = null;
+  let finalSelectedCharacterId: number | undefined = characterId;
+  
+  if (characterId) {
+    const characterResult = await getCharacterById(characterId);
+    if (characterResult.success) {
+      selectedCharacter = characterResult.data;
+    }
+  }
+  
+  // If no character selected or failed to fetch, use first character from initial data
+  if (!selectedCharacter && initialData.results.length > 0) {
+    selectedCharacter = initialData.results[0];
+    finalSelectedCharacterId = initialData.results[0].id;
+  }
 
   return (
     <div className={styles.page}>
@@ -35,10 +60,13 @@ export default async function Home() {
           />
         </div>
         <div className={styles.cardContent}>
-          {initialData.results.length > 0 && (
-            <CharacterInfo character={initialData.results[0]} />
+          {selectedCharacter && (
+            <CharacterInfo character={selectedCharacter} />
           )}
-          <CharacterList initialData={initialData} />
+          <CharacterList 
+            initialData={initialData} 
+            selectedCharacterId={finalSelectedCharacterId}
+          />
         </div>
       </div>
     </div>

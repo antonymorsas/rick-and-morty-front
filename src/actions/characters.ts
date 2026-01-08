@@ -1,7 +1,8 @@
 'use server';
 
-import { getCharacters } from 'rickmortyapi';
+import { getCharacters, getCharacter } from 'rickmortyapi';
 import type { CharactersResponse } from '@/types/api';
+import type { Character } from '@/types/character';
 import { successResult, errorResult } from '@/lib/core/errors/result';
 
 export async function getCharactersPage(
@@ -28,9 +29,7 @@ export async function searchCharacters(
 ): Promise<import('@/lib/core/errors/result').ActionResult<CharactersResponse>> {
   try {
     const response = await getCharacters({ name, page });
-    
-    // If the search returns 404 (Not Found), treat it as a successful empty result
-    // This is a valid state when no characters match the search query
+
     if (response.status === 404) {
       return successResult({
         info: {
@@ -49,8 +48,7 @@ export async function searchCharacters(
     
     return successResult(response.data as CharactersResponse);
   } catch (error) {
-    // Check if it's a 404 error (Not Found) - treat as empty result, not an error
-    // The API returns 404 when no characters match the search query
+
     const errorMessage = error instanceof Error ? error.message : String(error);
     if (
       errorMessage.includes('404') || 
@@ -70,6 +68,24 @@ export async function searchCharacters(
     
     return errorResult(
       error instanceof Error ? error : new Error('Failed to search characters')
+    );
+  }
+}
+
+export async function getCharacterById(
+  id: number
+): Promise<import('@/lib/core/errors/result').ActionResult<Character>> {
+  try {
+    const response = await getCharacter(id);
+    
+    if (response.status !== 200) {
+      throw new Error(`Failed to fetch character: ${response.statusMessage}`);
+    }
+    
+    return successResult(response.data as Character);
+  } catch (error) {
+    return errorResult(
+      error instanceof Error ? error : new Error('Failed to fetch character')
     );
   }
 }

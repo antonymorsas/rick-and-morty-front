@@ -7,17 +7,29 @@ import styles from './CharacterCard.module.css';
 
 interface CharacterCardProps {
   character: Character;
+  isSelected?: boolean;
+  onClick?: (id: number) => void;
 }
 
-export default function CharacterCard({ character }: CharacterCardProps) {
+export default function CharacterCard({ character, isSelected = false, onClick }: CharacterCardProps) {
   const [favorite, setFavorite] = useState(false);
 
-  const toggleFavorite = () => {
+  const toggleFavorite = (e: React.MouseEvent) => {
+    e.stopPropagation();
     setFavorite(!favorite);
   };
 
+  const handleCardClick = () => {
+    if (onClick) {
+      onClick(character.id);
+    }
+  };
+
   return (
-    <div className={styles.card}>
+    <div 
+      className={`${styles.card} ${isSelected ? styles.selected : ''}`}
+      onClick={handleCardClick}
+    >
       <h3 className={styles.title}>
         {character.name}
       </h3>
