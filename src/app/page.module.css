@@ -39,5 +39,6 @@
   border-radius: 16px;
   display: flex;
   overflow: hidden;
+  min-height: 600px; /* Equivalent to 2x2 grid of characters (2 rows) */
 }
 

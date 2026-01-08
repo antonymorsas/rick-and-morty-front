@@ -1,6 +1,9 @@
 .container {
   width: 100%;
   padding: 48px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
 }
 
 .errorMessage {
@@ -10,19 +13,38 @@
   border: 1px solid rgba(248, 113, 113, 0.4);
   color: #fca5a5;
   border-radius: 8px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .emptyState {
   text-align: center;
   padding: 32px 0;
   color: rgba(255, 255, 255, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  width: 100%;
+}
+
+.charactersWrapper .emptyState {
+  flex: 1;
+  min-height: auto;
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .charactersGrid {
   display: grid;
   grid-template-columns: 1fr;
   gap: 24px;
-  margin-bottom: 32px;
+  flex: 1;
+  width: 100%;
 }
 
 .pagination {
@@ -31,6 +53,9 @@
   justify-content: center;
   align-items: center;
   gap: 4px;
+  margin-left: 24px;
+  height: -webkit-fill-available;
+  justify-content: space-between;
 }
 
 .paginationButton {
@@ -84,6 +109,15 @@
 
 .charactersWrapper {
   display: flex;
+  align-items: flex-start;
+  gap: 0;
+  width: 100%;
+  min-height: 400px; 
+}
+
+.charactersWrapper:has(.emptyState:only-child) {
+  align-items: center;
+  justify-content: center;
 }
 
 @media (min-width: 768px) {

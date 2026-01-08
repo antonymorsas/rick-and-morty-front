@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import Image from 'next/image';
 import { useAction } from '@/hooks/useAction';
 import { getCharactersPage, searchCharacters } from '@/actions/characters';
 import type { CharactersResponse } from '@/types/api';
+import type { Character } from '@/types/character';
 import CharacterCard from './CharacterCard';
 import { SkeletonGrid } from './Skeleton';
 import SearchInput from './SearchInput';
@@ -15,103 +16,156 @@ interface CharacterListProps {
 }
 
 export default function CharacterList({ initialData }: CharacterListProps) {
-  const [characters, setCharacters] = useState(initialData.results);
+  const CHARACTERS_PER_PAGE_UI = 4;
+  const [cachedCharacters, setCachedCharacters] = useState<Character[]>(initialData.results);
   const [info, setInfo] = useState(initialData.info);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [apiPage, setApiPage] = useState(1);
+  const [internalPage, setInternalPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isNavigatingBackward, setIsNavigatingBackward] = useState(false);
 
   const { error, isLoading, execute } = useAction<CharactersResponse>({
     onSuccess: (data) => {
       if (data) {
-        setCharacters(data.results);
+        setCachedCharacters(data.results);
         setInfo(data.info);
+        if (isNavigatingBackward) {
+          const lastInternalPage = Math.ceil(data.results.length / CHARACTERS_PER_PAGE_UI);
+          setInternalPage(lastInternalPage);
+          setIsNavigatingBackward(false);
+        } else {
+          setInternalPage(1);
+        }
       }
     },
   });
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-    if (searchQuery) {
-      execute(() => searchCharacters(searchQuery, page));
+  const displayedCharacters = useMemo(() => {
+    const startIndex = (internalPage - 1) * CHARACTERS_PER_PAGE_UI;
+    const endIndex = startIndex + CHARACTERS_PER_PAGE_UI;
+    return cachedCharacters.slice(startIndex, endIndex);
+  }, [cachedCharacters, internalPage]);
+
+  const totalInternalPages = useMemo(() => {
+    return Math.ceil(cachedCharacters.length / CHARACTERS_PER_PAGE_UI);
+  }, [cachedCharacters]);
+
+  const hasMoreInCache = useMemo(() => {
+    return internalPage < totalInternalPages;
+  }, [internalPage, totalInternalPages]);
+
+  const handlePageChange = (direction: 'next' | 'prev') => {
+    if (direction === 'next') {
+      if (hasMoreInCache) {
+        setInternalPage(internalPage + 1);
+      } else {
+        const nextApiPage = apiPage + 1;
+        setApiPage(nextApiPage);
+        if (searchQuery) {
+          execute(() => searchCharacters(searchQuery, nextApiPage));
+        } else {
+          execute(() => getCharactersPage(nextApiPage));
+        }
+      }
     } else {
-      execute(() => getCharactersPage(page));
+      if (internalPage > 1) {
+        setInternalPage(internalPage - 1);
+      } else {
+        const prevApiPage = apiPage - 1;
+        if (prevApiPage >= 1) {
+          setApiPage(prevApiPage);
+          setIsNavigatingBackward(true);
+          if (searchQuery) {
+            execute(() => searchCharacters(searchQuery, prevApiPage));
+          } else {
+            execute(() => getCharactersPage(prevApiPage));
+          }
+        }
+      }
     }
   };
 
-  const handleSearch = (query: string) => {
+  const handleSearch = useCallback((query: string) => {
     setSearchQuery(query);
-    setCurrentPage(1);
+    setApiPage(1);
+    setInternalPage(1);
     if (query.trim()) {
+      setCachedCharacters([]);
       execute(() => searchCharacters(query, 1));
     } else {
       execute(() => getCharactersPage(1));
     }
-  };
+  }, [execute]);
 
   return (
     <div className={styles.container}>
       <SearchInput onSearch={handleSearch} />
       
-      {/* Error Message */}
-      {error && (
+      {/* Error Message - Only show if it's not a "Not Found" error during search */}
+      {error && !(searchQuery && (
+        error.message.includes('Not Found') || 
+        error.message.includes('404') ||
+        error.message.toLowerCase().includes('not found')
+      )) && (
         <div className={styles.errorMessage}>
           {error.message}
         </div>
       )}
 
-      {/* Loading State */}
-      {isLoading && <SkeletonGrid count={8} />}
-
       {/* Characters Grid */}
-      {!isLoading && (
-        <>
-          {characters.length === 0 ? (
+      {!isLoading && cachedCharacters.length === 0 ? (
+        <div className={styles.emptyState}>
+          <p>No characters found.</p>
+        </div>
+      ) : (
+        <div className={styles.charactersWrapper}>
+          {isLoading ? (
+            <SkeletonGrid count={CHARACTERS_PER_PAGE_UI} />
+          ) : displayedCharacters.length === 0 ? (
             <div className={styles.emptyState}>
               <p>No characters found.</p>
             </div>
           ) : (
-            <div className={styles.charactersWrapper}>
-              <div className={styles.charactersGrid}>
-                {characters.map((character) => (
-                  <CharacterCard key={character.id} character={character} />
-                ))}
-              </div>
-
-              {/* Pagination */}
-              {info.pages > 1 && (
-                <div className={styles.pagination}>
-                  <button
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    disabled={!info.prev || isLoading}
-                    className={styles.paginationButton}
-                  >
-                    <Image 
-                      src="/icons/arrow.svg" 
-                      alt="previous page" 
-                      width={17} 
-                      height={11}
-                      className={styles.arrowIcon}
-                    />
-                  </button>
-                  
-                  <button
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={!info.next || isLoading}
-                    className={styles.paginationButton}
-                  >
-                    <Image 
-                      src="/icons/arrow.svg" 
-                      alt="next page" 
-                      width={17} 
-                      height={11}
-                      className={`${styles.arrowIcon} ${styles.arrowIconRotated}`}
-                    />
-                  </button>
-                </div>
-              )}
+            <div className={styles.charactersGrid}>
+              {displayedCharacters.map((character) => (
+                <CharacterCard key={character.id} character={character} />
+              ))}
             </div>
           )}
-        </>
+
+          {/* Pagination */}
+          {(info.pages > 1 || hasMoreInCache || internalPage > 1 || isLoading) && (
+            <div className={styles.pagination}>
+              <button
+                onClick={() => handlePageChange('prev')}
+                disabled={(internalPage === 1 && apiPage === 1) || isLoading}
+                className={styles.paginationButton}
+              >
+                <Image 
+                  src="/icons/arrow.svg" 
+                  alt="previous page" 
+                  width={17} 
+                  height={11}
+                  className={styles.arrowIcon}
+                />
+              </button>
+              
+              <button
+                onClick={() => handlePageChange('next')}
+                disabled={(!hasMoreInCache && !info.next) || isLoading}
+                className={styles.paginationButton}
+              >
+                <Image 
+                  src="/icons/arrow.svg" 
+                  alt="next page" 
+                  width={17} 
+                  height={11}
+                  className={`${styles.arrowIcon} ${styles.arrowIconRotated}`}
+                />
+              </button>
+            </div>
+          )}
+        </div>
       )}
     </div>
   );
