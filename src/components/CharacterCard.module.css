@@ -39,3 +39,19 @@
   object-fit: cover;
 }
 
+.favoriteButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.favoriteIcon {
+  filter: brightness(0) invert(1);
+  transition: filter 0.2s;
+}
+
+.favoriteIconActive {
+  filter: brightness(0) saturate(100%) invert(15%) sepia(94%) saturate(7151%) hue-rotate(353deg) brightness(95%) contrast(89%);
+  transition: filter 0.2s;
+}
+

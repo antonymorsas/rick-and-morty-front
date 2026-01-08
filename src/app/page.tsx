@@ -1,6 +1,7 @@
 import Image from "next/image";
 import CharacterList from "../components/CharacterList";
 import CharacterInfo from "../components/CharacterInfo";
+import Favs from "../components/Favs";
 import { getCharactersPage, getCharacterById } from "../actions/characters";
 import type { CharactersResponse } from "@/types/api";
 import type { Character } from "@/types/character";
@@ -12,10 +13,12 @@ interface HomeProps {
 
 export default async function Home({ searchParams }: HomeProps) {
   const params = await searchParams;
-  const characterId = params.characterId ? Number(params.characterId) : undefined;
-  
+  const characterId = params.characterId
+    ? Number(params.characterId)
+    : undefined;
+
   const result = await getCharactersPage(1);
-  
+
   const initialData: CharactersResponse = result.success
     ? result.data
     : {
@@ -31,15 +34,14 @@ export default async function Home({ searchParams }: HomeProps) {
   // Get selected character
   let selectedCharacter: Character | null = null;
   let finalSelectedCharacterId: number | undefined = characterId;
-  
+
   if (characterId) {
     const characterResult = await getCharacterById(characterId);
     if (characterResult.success) {
       selectedCharacter = characterResult.data;
     }
   }
-  
-  // If no character selected or failed to fetch, use first character from initial data
+
   if (!selectedCharacter && initialData.results.length > 0) {
     selectedCharacter = initialData.results[0];
     finalSelectedCharacterId = initialData.results[0].id;
@@ -60,13 +62,14 @@ export default async function Home({ searchParams }: HomeProps) {
           />
         </div>
         <div className={styles.cardContent}>
-          {selectedCharacter && (
-            <CharacterInfo character={selectedCharacter} />
-          )}
-          <CharacterList 
-            initialData={initialData} 
-            selectedCharacterId={finalSelectedCharacterId}
-          />
+          {selectedCharacter && <CharacterInfo character={selectedCharacter} />}
+          <div className="flex flex-col gap-2 w-full">
+            <CharacterList
+              initialData={initialData}
+              selectedCharacterId={finalSelectedCharacterId}
+            />
+            <Favs />
+          </div>
         </div>
       </div>
     </div>
