@@ -31,7 +31,6 @@ export default async function Home({ searchParams }: HomeProps) {
         results: [],
       };
 
-  // Get selected character
   let selectedCharacter: Character | null = null;
   let finalSelectedCharacterId: number | undefined = characterId;
 
@@ -62,12 +61,21 @@ export default async function Home({ searchParams }: HomeProps) {
           />
         </div>
         <div className={styles.cardContent}>
-          {selectedCharacter && <CharacterInfo character={selectedCharacter} />}
-          <div className="flex flex-col gap-2 w-full">
+          {selectedCharacter && (
+            <div className={styles.characterInfoWrapper} data-character-info>
+              <CharacterInfo character={selectedCharacter} />
+            </div>
+          )}
+          <div className={styles.rightColumn}>
             <CharacterList
               initialData={initialData}
               selectedCharacterId={finalSelectedCharacterId}
             />
+            <div className={styles.favsWrapperDesktop}>
+              <Favs />
+            </div>
+          </div>
+          <div className={styles.favsWrapperMobile}>
             <Favs />
           </div>
         </div>

@@ -2,9 +2,10 @@
   position: relative;
   width: 100%;
   min-height: 400px;
-  overflow: hidden;
+  overflow: visible;
   display: flex;
   flex-direction: column;
+  height: 100%;
 }
 
 .statusContainer {

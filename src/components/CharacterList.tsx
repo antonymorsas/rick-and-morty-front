@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAction } from '@/hooks/useAction';
@@ -20,13 +20,103 @@ interface CharacterListProps {
 export default function CharacterList({ initialData, selectedCharacterId }: CharacterListProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const CHARACTERS_PER_PAGE_UI = 4;
+  const [isMobile, setIsMobile] = useState(false);
+  const [paginationTop, setPaginationTop] = useState<string>('50%');
+  const paginationRef = useRef<HTMLDivElement>(null);
+  
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  useEffect(() => {
+    if (!isMobile || !paginationRef.current) return;
+
+    const updatePaginationPosition = () => {
+      const characterInfoWrapper = document.querySelector('[data-character-info]');
+      if (characterInfoWrapper && paginationRef.current) {
+        const rect = characterInfoWrapper.getBoundingClientRect();
+        const centerY = rect.top + rect.height / 2;
+        const buttonHeight = 32; // altura del botón
+        const topPosition = centerY - buttonHeight / 2;
+        setPaginationTop(`${topPosition}px`);
+      }
+    };
+
+    // Pequeño delay para asegurar que el DOM esté renderizado
+    const timeoutId = setTimeout(updatePaginationPosition, 100);
+    window.addEventListener('resize', updatePaginationPosition);
+    window.addEventListener('scroll', updatePaginationPosition);
+
+    return () => {
+      clearTimeout(timeoutId);
+      window.removeEventListener('resize', updatePaginationPosition);
+      window.removeEventListener('scroll', updatePaginationPosition);
+    };
+  }, [isMobile, selectedCharacterId]);
+  
+  const CHARACTERS_PER_PAGE_UI = useMemo(() => isMobile ? 2 : 4, [isMobile]);
   const [cachedCharacters, setCachedCharacters] = useState<Character[]>(initialData.results);
   const [info, setInfo] = useState(initialData.info);
   const [apiPage, setApiPage] = useState(1);
   const [internalPage, setInternalPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
   const [isNavigatingBackward, setIsNavigatingBackward] = useState(false);
+  const prevCharactersPerPageRef = useRef(CHARACTERS_PER_PAGE_UI);
+  const syncTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  
+  useEffect(() => {
+    if (cachedCharacters.length === 0) {
+      prevCharactersPerPageRef.current = CHARACTERS_PER_PAGE_UI;
+      return;
+    }
+    
+    if (prevCharactersPerPageRef.current === CHARACTERS_PER_PAGE_UI) {
+      return;
+    }
+    
+    const totalPages = Math.ceil(cachedCharacters.length / CHARACTERS_PER_PAGE_UI);
+    const prevStartIndex = (internalPage - 1) * prevCharactersPerPageRef.current;
+    
+    let newPage = Math.floor(prevStartIndex / CHARACTERS_PER_PAGE_UI) + 1;
+
+    if (newPage > totalPages && totalPages > 0) {
+      newPage = totalPages;
+    } else if (newPage < 1) {
+      newPage = 1;
+    }
+    
+    const newStartIndex = (newPage - 1) * CHARACTERS_PER_PAGE_UI;
+    if (newStartIndex >= cachedCharacters.length && cachedCharacters.length > 0) {
+      newPage = Math.max(1, Math.ceil(cachedCharacters.length / CHARACTERS_PER_PAGE_UI));
+    }
+    
+    if (newPage !== internalPage) {
+      if (syncTimeoutRef.current) {
+        clearTimeout(syncTimeoutRef.current);
+      }
+      syncTimeoutRef.current = setTimeout(() => {
+        setInternalPage(newPage);
+        prevCharactersPerPageRef.current = CHARACTERS_PER_PAGE_UI;
+      }, 0);
+    } else {
+      prevCharactersPerPageRef.current = CHARACTERS_PER_PAGE_UI;
+    }
+    
+    return () => {
+      if (syncTimeoutRef.current) {
+        clearTimeout(syncTimeoutRef.current);
+      }
+    };
+  }, [CHARACTERS_PER_PAGE_UI, cachedCharacters.length, internalPage]);
+  
+  const effectivePage = internalPage;
 
   const handleCharacterClick = useCallback((id: number) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -51,18 +141,18 @@ export default function CharacterList({ initialData, selectedCharacterId }: Char
   });
 
   const displayedCharacters = useMemo(() => {
-    const startIndex = (internalPage - 1) * CHARACTERS_PER_PAGE_UI;
+    const startIndex = (effectivePage - 1) * CHARACTERS_PER_PAGE_UI;
     const endIndex = startIndex + CHARACTERS_PER_PAGE_UI;
     return cachedCharacters.slice(startIndex, endIndex);
-  }, [cachedCharacters, internalPage]);
+  }, [cachedCharacters, effectivePage, CHARACTERS_PER_PAGE_UI]);
 
   const totalInternalPages = useMemo(() => {
     return Math.ceil(cachedCharacters.length / CHARACTERS_PER_PAGE_UI);
-  }, [cachedCharacters]);
+  }, [cachedCharacters, CHARACTERS_PER_PAGE_UI]);
 
   const hasMoreInCache = useMemo(() => {
-    return internalPage < totalInternalPages;
-  }, [internalPage, totalInternalPages]);
+    return effectivePage < totalInternalPages;
+  }, [effectivePage, totalInternalPages]);
 
   const handlePageChange = (direction: 'next' | 'prev') => {
     if (direction === 'next') {
@@ -150,7 +240,11 @@ export default function CharacterList({ initialData, selectedCharacterId }: Char
 
           {/* Pagination */}
           {(info.pages > 1 || hasMoreInCache || internalPage > 1 || isLoading) && (
-            <div className={styles.pagination}>
+            <div 
+              ref={paginationRef}
+              className={styles.pagination}
+              style={isMobile ? { top: paginationTop, transform: 'translateY(0)' } : undefined}
+            >
               <button
                 onClick={() => handlePageChange('prev')}
                 disabled={(internalPage === 1 && apiPage === 1) || isLoading}

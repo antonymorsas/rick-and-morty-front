@@ -37,9 +37,3 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-
-@media (max-width: 768px) {
-  body {
-    background-attachment: scroll;
-  }
-}

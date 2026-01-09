@@ -1,5 +1,5 @@
 .card {
-  background-color: rgba(33, 33, 33, 0.8);
+  background-color: #414141;
   padding: 12px 24px;
   border-radius: 30px;
   cursor: pointer;
@@ -9,13 +9,19 @@
   transition: box-shadow 0.3s ease, border-color 0.3s ease, background-color 0.3s ease;
 }
 
+@media (max-width: 768px) {
+  .card {
+    padding: 8px 12px;
+  }
+}
+
 .card:hover {
-  background-color: rgba(79, 79, 79, 0.8);
+  background-color: #666666;
   box-shadow: 15px 15px 30px #191919;
 }
 
 .card.selected {
-  background-color: rgba(79, 79, 79, 0.8);
+  background-color: #666666;
   box-shadow: 15px 15px 30px #191919;
   border-color: var(--primary);
 }

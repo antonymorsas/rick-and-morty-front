@@ -40,7 +40,7 @@
 
 .charactersGrid {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(2, 1fr);
   gap: 24px;
   flex: 1;
   width: 100%;
@@ -122,6 +122,62 @@
 @media (min-width: 768px) {
   .charactersGrid {
     grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 0;
+  }
+
+  .emptyState {
+    min-height: 200px;
+  }
+
+  .charactersWrapper {
+    min-height: 200px;
+    position: relative;
+  }
+
+  .pagination {
+    position: fixed;
+    left: 0;
+    right: 0;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0;
+    margin-left: 0;
+    height: auto;
+    z-index: 10;
+    pointer-events: none;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .paginationButton {
+    pointer-events: auto;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .paginationButton:first-child {
+    left: 24px;
+    border-radius: 8px 0 0 8px;
+  }
+
+  .paginationButton:last-child {
+    right: 24px;
+    border-radius: 0 8px 8px 0;
+  }
+
+  .paginationButton:first-child .arrowIcon {
+    transform: rotate(-90deg);
+  }
+
+  .paginationButton:last-child .arrowIconRotated {
+    transform: rotate(90deg);
   }
 }
 

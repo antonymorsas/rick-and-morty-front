@@ -6,7 +6,7 @@
 }
 
 .gradientOverlay {
-  position: fixed;
+  position: absolute;
   bottom: 0;
   left: 0;
   width: 100%;
@@ -19,8 +19,8 @@
   max-width: 1280px;
   margin-left: auto;
   margin-right: auto;
-  padding-left: 16px;
-  padding-right: 16px;
+  padding-left: 64px;
+  padding-right: 64px;
 }
 
 .titleContainer {
@@ -40,5 +40,67 @@
   display: flex;
   overflow: hidden;
   min-height: 600px;
+}
+
+.rightColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.characterInfoWrapper {
+  width: 100%;
+}
+
+.favsWrapperDesktop {
+  width: 100%;
+}
+
+.favsWrapperMobile {
+  display: none;
+}
+
+/* Mobile styles */
+@media (max-width: 768px) {
+  .page {
+    padding-bottom: 64px;
+  }
+
+  .gradientOverlay {
+    height: 65px;
+  }
+
+  .container {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
+  .cardContent {
+    flex-direction: column;
+    background-color: transparent;
+    position: relative;
+  }
+
+  .rightColumn {
+    order: 1;
+    margin-bottom: 32px;
+  }
+
+  .characterInfoWrapper {
+    order: 2;
+    padding-left: 32px;
+    padding-right: 32px;
+  }
+
+  .favsWrapperDesktop {
+    display: none;
+  }
+
+  .favsWrapperMobile {
+    display: block;
+    order: 3;
+    margin-top: 64px;
+  }
 }
 

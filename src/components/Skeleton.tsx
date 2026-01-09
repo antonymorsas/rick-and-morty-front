@@ -41,7 +41,7 @@ interface SkeletonGridProps {
   count?: number;
 }
 
-export function SkeletonGrid({ count = 8 }: SkeletonGridProps) {
+export function SkeletonGrid({ count = 2 }: SkeletonGridProps) {
   return (
     <div className={styles.skeletonGrid}>
       <SkeletonCard count={count} />

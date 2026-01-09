@@ -53,15 +53,9 @@
 
 .skeletonGrid {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(2, 1fr);
   gap: 24px;
   flex: 1;
   width: 100%;
-}
-
-@media (min-width: 768px) {
-  .skeletonGrid {
-    grid-template-columns: repeat(2, 1fr);
-  }
 }
 
