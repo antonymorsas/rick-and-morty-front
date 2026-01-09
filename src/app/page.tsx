@@ -33,15 +33,18 @@ export default async function Home({ searchParams }: HomeProps) {
 
   let selectedCharacter: Character | null = null;
   let finalSelectedCharacterId: number | undefined = characterId;
+  let characterNotFound = false;
 
   if (characterId) {
     const characterResult = await getCharacterById(characterId);
     if (characterResult.success) {
       selectedCharacter = characterResult.data;
+    } else {
+      characterNotFound = true;
     }
   }
 
-  if (!selectedCharacter && initialData.results.length > 0) {
+  if (!selectedCharacter && !characterNotFound && initialData.results.length > 0) {
     selectedCharacter = initialData.results[0];
     finalSelectedCharacterId = initialData.results[0].id;
   }
@@ -61,11 +64,15 @@ export default async function Home({ searchParams }: HomeProps) {
           />
         </div>
         <div className={styles.cardContent}>
-          {selectedCharacter && (
+          {characterNotFound ? (
+            <div className={styles.characterInfoWrapper} data-character-info>
+              <CharacterInfo character={null} characterId={characterId} />
+            </div>
+          ) : selectedCharacter ? (
             <div className={styles.characterInfoWrapper} data-character-info>
               <CharacterInfo character={selectedCharacter} />
             </div>
-          )}
+          ) : null}
           <div className={styles.rightColumn}>
             <CharacterList
               initialData={initialData}

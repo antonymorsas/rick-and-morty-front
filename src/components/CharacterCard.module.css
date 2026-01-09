@@ -46,9 +46,14 @@
 }
 
 .favoriteButton {
+  width: 100%;
   display: flex;
+  justify-content: center;
   align-items: center;
   gap: 8px;
+  margin-top: 8px;
+  cursor: pointer;
+  user-select: none;
 }
 
 .favoriteIcon {

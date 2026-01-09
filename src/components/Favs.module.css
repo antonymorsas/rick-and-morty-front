@@ -23,7 +23,7 @@
 }
 
 .button:hover {
-  color: var(--primary-color, #9def25);
+  color: var(--primary);
 }
 
 .buttonExpanded {

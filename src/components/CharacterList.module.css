@@ -49,12 +49,12 @@
 .pagination {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   gap: 4px;
   margin-left: 24px;
-  height: -webkit-fill-available;
-  justify-content: space-between;
+  align-self: stretch;
+  flex-shrink: 0;
 }
 
 .paginationButton {

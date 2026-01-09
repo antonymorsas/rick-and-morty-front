@@ -44,7 +44,7 @@ export default function CharacterCard({ character, isSelected = false, onClick }
           sizes="(max-width: 768px) 100vw, (max-width: 768px) 100vw, 33vw"
         />
       </div>
-      <div className={`w-full flex justify-center items-center gap-2 mt-2 cursor-pointer select-none ${styles.favoriteButton}`} onClick={handleToggleFavorite}>
+      <div className={styles.favoriteButton} onClick={handleToggleFavorite}>
         <Image
           src="/icons/heart.svg"
           alt="Like"

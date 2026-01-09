@@ -1,16 +1,14 @@
-@import "tailwindcss";
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
 
 :root {
   --background: #ffffff;
   --foreground: #0c0c0c;
   --primary: #76DD00;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-primary: var(--primary);
-  --font-sans: var(--font-roboto-condensed);
 }
 
 @media (prefers-color-scheme: dark) {

@@ -4,10 +4,28 @@ import CharacterStatus from "./CharacterStatus";
 import styles from "./CharacterInfo.module.css";
 
 interface CharacterInfoProps {
-  character: Character;
+  character: Character | null;
+  characterId?: number;
 }
 
-export default function CharacterInfo({ character }: CharacterInfoProps) {
+export default function CharacterInfo({ character, characterId }: CharacterInfoProps) {
+  if (!character && characterId !== undefined) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.errorContent}>
+          <h3 className={styles.errorTitle}>Character Not Found</h3>
+          <p className={styles.errorMessage}>
+            The character with ID <strong>{characterId}</strong> does not exist.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!character) {
+    return null;
+  }
+
   return (
     <div className={styles.container}>
       <div className={styles.statusContainer}>
